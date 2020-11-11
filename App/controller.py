@@ -41,11 +41,68 @@ recae sobre el controlador.
 # ___________________________________________________
 
 
+def init():
+    """
+    Llama la funcion de inicializacion  del modelo.
+    """
+    citibike = model.newCitibike()
+    return citibike
+
 # ___________________________________________________
 #  Funciones para la carga de datos y almacenamiento
 #  de datos en los modelos
 # ___________________________________________________
 
+
+def loadStations(citibike, filename: str):
+    filename = cf.data_dir + filename
+    file = csv.DictReader(open(filename, encoding="utf-8"), delimiter=',')
+    for trip in file:
+        model.addTrip(citibike, trip)
+
 # ___________________________________________________
 #  Funciones para consultas
 # ___________________________________________________
+
+
+def totalStations(analyzer):
+    """
+    Total de paradas de autobus
+    """
+    return model.totalStations(analyzer)
+
+
+def totalTrips(analyzer):
+    """
+    Total de enlaces entre las paradas
+    """
+    return model.totalTrips(analyzer)
+
+
+def connectedComponents(citibikes):
+    """
+    Numero de componentes fuertemente conectados
+    """
+    return model.connectedComponents(citibikes)
+
+
+def minimumCostPaths(citibikes, initialStation):
+    """
+    Calcula todos los caminos de costo minimo de initialStation a todas
+    las otras estaciones del sistema
+    """
+    return model.minimumCostPaths(citibikes, initialStation)
+
+
+def hasPath(citibikes, destStation):
+    """
+    Informa si existe un camino entre initialStation y destStation
+    """
+    return model.hasPath(citibikes, destStation)
+
+
+def minimumCostPath(citibikes, destStation):
+    """
+    Retorna el camino de costo minimo desde initialStation a destStation
+    """
+    return model.minimumCostPath(citibikes, destStation)

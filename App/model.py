@@ -42,11 +42,103 @@ de creacion y consulta sobre las estructuras de datos.
 #                       API
 # -----------------------------------------------------
 
+
+def compareStations(stat, keyval): return 0 if stat == keyval['key'] else (
+    1 if stat > keyval['key'] else -1)
+
+
+def newCitibike():
+    try:
+        citibike = {}
+        citibike["stations"] = m.newMap(numelements=1000,
+                                        maptype="PROBING",
+                                        comparefunction=compareStations)
+        citibike["graph"] = gr.newGraph(datastructure="ADJ_LIST",
+                                        directed=True,
+                                        size=1000,
+                                        comparefunction=compareStations)
+        citibike["paths"] = None
+        citibike["components"] = None
+
+        return citibike
+    except Exception as e:
+        error.reraise(e, "model:newCitibike")
+
+
+def addStation(citibike, stationID):
+    if not gr.containsVertex(citibike["graph"], stationID):
+        gr.insertVertex(citibike["graph"], stationID)
+    return citibike
+
+
+def addTrip(citibike, trip):
+    addStation(citibike, trip['start station id'])
+    addStation(citibike, trip['end station id'])
+    addArc(citibike, trip['start station id'],
+           trip['end station id'],
+           int(trip['tripduration']))
+
+
+def addArc(citibike, origin, destination, duration):
+    if gr.getEdge(citibike["graph"], origin, destination) is None:
+        gr.addEdge(citibike["graph"], origin, destination, duration)
+    return citibike
+
+
 # Funciones para agregar informacion al grafo
 
 # ==============================
 # Funciones de consulta
 # ==============================
+
+def connectedComponents(citibikes):
+    """
+    Calcula los componentes conectados del grafo
+    Se utiliza el algoritmo de Kosaraju
+    """
+    citibikes['components'] = scc.KosarajuSCC(citibikes['graph'])
+    return scc.connectedComponents(citibikes['components'])
+
+
+def minimumCostPaths(citibikes, initialStation):
+    """
+    Calcula los caminos de costo mínimo desde la estacion initialStation
+    a todos los demas vertices del grafo
+    """
+    citibikes['paths'] = djk.Dijkstra(citibikes['graph'], initialStation)
+    return citibikes
+
+
+def hasPath(citibikes, destStation):
+    """
+    Indica si existe un camino desde la estacion inicial a la estación destino
+    Se debe ejecutar primero la funcion minimumCostPaths
+    """
+    return djk.hasPathTo(citibikes['paths'], destStation)
+
+
+def minimumCostPath(citibikes, destStation):
+    """
+    Retorna el camino de costo minimo entre la estacion de inicio
+    y la estacion destino
+    Se debe ejecutar primero la funcion minimumCostPaths
+    """
+    path = djk.pathTo(citibikes['paths'], destStation)
+    return path
+
+
+def totalStations(citibikes):
+    """
+    Retorna el total de estaciones (vertices) del grafo
+    """
+    return gr.numVertices(citibikes['graph'])
+
+
+def totalTrips(citibikes):
+    """
+    Retorna el total arcos del grafo
+    """
+    return gr.numEdges(citibikes['graph'])
 
 # ==============================
 # Funciones Helper
