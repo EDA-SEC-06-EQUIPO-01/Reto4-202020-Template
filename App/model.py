@@ -31,6 +31,7 @@ from DISClib.DataStructures import listiterator as it
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
 from DISClib.Utils import error as error
+
 assert config
 
 """
@@ -43,20 +44,22 @@ de creacion y consulta sobre las estructuras de datos.
 # -----------------------------------------------------
 
 
-def compareStations(stat, keyval): return 0 if stat == keyval['key'] else (
-    1 if stat > keyval['key'] else -1)
+def compareStations(stat, keyval):
+    return 0 if stat == keyval["key"] else (1 if stat > keyval["key"] else -1)
 
 
 def newCitibike():
     try:
         citibike = {}
-        citibike["stations"] = m.newMap(numelements=1000,
-                                        maptype="PROBING",
-                                        comparefunction=compareStations)
-        citibike["graph"] = gr.newGraph(datastructure="ADJ_LIST",
-                                        directed=True,
-                                        size=1000,
-                                        comparefunction=compareStations)
+        citibike["stations"] = m.newMap(
+            numelements=1000, maptype="PROBING", comparefunction=compareStations
+        )
+        citibike["graph"] = gr.newGraph(
+            datastructure="ADJ_LIST",
+            directed=True,
+            size=1000,
+            comparefunction=compareStations,
+        )
         citibike["paths"] = None
         citibike["components"] = None
 
@@ -72,11 +75,14 @@ def addStation(citibike, stationID):
 
 
 def addTrip(citibike, trip):
-    addStation(citibike, trip['start station id'])
-    addStation(citibike, trip['end station id'])
-    addArc(citibike, trip['start station id'],
-           trip['end station id'],
-           int(trip['tripduration']))
+    addStation(citibike, trip["start station id"])
+    addStation(citibike, trip["end station id"])
+    addArc(
+        citibike,
+        trip["start station id"],
+        trip["end station id"],
+        int(trip["tripduration"]),
+    )
 
 
 def addArc(citibike, origin, destination, duration):
@@ -91,13 +97,19 @@ def addArc(citibike, origin, destination, duration):
 # Funciones de consulta
 # ==============================
 
+
 def connectedComponents(citibikes):
     """
     Calcula los componentes conectados del grafo
     Se utiliza el algoritmo de Kosaraju
     """
-    citibikes['components'] = scc.KosarajuSCC(citibikes['graph'])
-    return scc.connectedComponents(citibikes['components'])
+    citibikes["components"] = scc.KosarajuSCC(citibikes["graph"])
+    return scc.connectedComponents(citibikes["components"])
+
+
+def sameCC(sc, station1, station2):
+    sct = scc.KosarajuSCC(sc["graph"])
+    return scc.stronglyConnected(sct, station1, station2)
 
 
 def minimumCostPaths(citibikes, initialStation):
@@ -105,7 +117,7 @@ def minimumCostPaths(citibikes, initialStation):
     Calcula los caminos de costo mínimo desde la estacion initialStation
     a todos los demas vertices del grafo
     """
-    citibikes['paths'] = djk.Dijkstra(citibikes['graph'], initialStation)
+    citibikes["paths"] = djk.Dijkstra(citibikes["graph"], initialStation)
     return citibikes
 
 
@@ -114,7 +126,7 @@ def hasPath(citibikes, destStation):
     Indica si existe un camino desde la estacion inicial a la estación destino
     Se debe ejecutar primero la funcion minimumCostPaths
     """
-    return djk.hasPathTo(citibikes['paths'], destStation)
+    return djk.hasPathTo(citibikes["paths"], destStation)
 
 
 def minimumCostPath(citibikes, destStation):
@@ -123,7 +135,7 @@ def minimumCostPath(citibikes, destStation):
     y la estacion destino
     Se debe ejecutar primero la funcion minimumCostPaths
     """
-    path = djk.pathTo(citibikes['paths'], destStation)
+    path = djk.pathTo(citibikes["paths"], destStation)
     return path
 
 
@@ -131,14 +143,15 @@ def totalStations(citibikes):
     """
     Retorna el total de estaciones (vertices) del grafo
     """
-    return gr.numVertices(citibikes['graph'])
+    return gr.numVertices(citibikes["graph"])
 
 
 def totalTrips(citibikes):
     """
     Retorna el total arcos del grafo
     """
-    return gr.numEdges(citibikes['graph'])
+    return gr.numEdges(citibikes["graph"])
+
 
 # ==============================
 # Funciones Helper

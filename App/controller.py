@@ -48,6 +48,7 @@ def init():
     citibike = model.newCitibike()
     return citibike
 
+
 # ___________________________________________________
 #  Funciones para la carga de datos y almacenamiento
 #  de datos en los modelos
@@ -56,9 +57,14 @@ def init():
 
 def loadStations(citibike, filename: str):
     filename = cf.data_dir + filename
-    file = csv.DictReader(open(filename, encoding="utf-8"), delimiter=',')
+    file = csv.DictReader(open(filename, encoding="utf-8"), delimiter=",")
+    c = 0
     for trip in file:
+        c += 1
         model.addTrip(citibike, trip)
+
+    print(f"Se cargaron {c} viajes")
+
 
 # ___________________________________________________
 #  Funciones para consultas
@@ -77,6 +83,10 @@ def totalTrips(analyzer):
     Total de enlaces entre las paradas
     """
     return model.totalTrips(analyzer)
+
+
+def sameCC(sc, station1, station2):
+    return model.sameCC(sc, station1, station2)
 
 
 def connectedComponents(citibikes):

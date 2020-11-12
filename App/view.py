@@ -31,6 +31,7 @@ import config
 from App import controller
 from DISClib.ADT import stack
 import timeit
+
 assert config
 
 """
@@ -44,13 +45,14 @@ operación seleccionada.
 #  Variables
 # ___________________________________________________
 
-fnms = ("201801-1-citibike-tripdata.csv",
-        "201801-2-citibike-tripdata.csv",
-        "201801-3-citibike-tripdata.csv",
-        "201801-4-citibike-tripdata.csv"
-        )
+fnms = (
+    "201801-1-citibike-tripdata.csv",
+    "201801-2-citibike-tripdata.csv",
+    "201801-3-citibike-tripdata.csv",
+    "201801-4-citibike-tripdata.csv",
+)
 
-option = 1
+option = 41
 
 filename = fnms[option - 1]
 
@@ -66,7 +68,7 @@ Menu principal
 
 def showMenu() -> str:
 
-    print("\n" + "*"*50)
+    print("\n" + "*" * 50)
     print("Bienvenido")
     print("1- Inicializar Estructuras")
     print("2- Cargar información de CitiBike")
@@ -79,7 +81,7 @@ def showMenu() -> str:
     print("9- Req 7. Identificación de Estaciones para Publicidad")
     print("10- Req 8. Identificador de Bicicletas de Mantenimiento")
     print("0- Salir")
-    enter = int(input("*"*50 + "\n>"))
+    enter = int(input("*" * 50 + "\n>"))
     return enter
 
 
@@ -88,15 +90,18 @@ def opt2(citibikes, filename, recursionLimit):
     controller.loadStations(citibikes, filename)
     numedges = controller.totalTrips(citibikes)
     numvertex = controller.totalStations(citibikes)
-    print('Numero de vertices: ' + str(numvertex))
-    print('Numero de arcos: ' + str(numedges))
-    print('El limite de recursion actual: ' + str(sys.getrecursionlimit()))
+    print("Numero de vertices: " + str(numvertex))
+    print("Numero de arcos: " + str(numedges))
+    print("El limite de recursion actual: " + str(sys.getrecursionlimit()))
     sys.setrecursionlimit(recursionLimit)
-    print('El limite de recursion se ajusta a: ' + str(recursionLimit))
+    print("El limite de recursion se ajusta a: " + str(recursionLimit))
 
 
-def opt3():
-    1
+def opt3(citibikes, id1, id2):
+    print(f"Los clusteres son {controller.connectedComponents(citibikes)}")
+    print(
+        f"Las estaciones {id1} y {id2} {'si' if controller.sameCC(citibikes, id1, id2) else 'no'} estan fuertemente conectadas"
+    )
 
 
 def opt4():
@@ -133,11 +138,12 @@ def main():
         if enter == 1:
             cbk = controller.init()
         elif enter == 2:
-            time = timeit.timeit(
-                partial(opt2, cbk, filename, recursionLimit), number=1)
+            time = timeit.timeit(partial(opt2, cbk, filename, recursionLimit), number=1)
             print(f"Tiempo de ejecución: {time}")
         elif enter == 3:
-            time = timeit.timeit(opt3, number=1)
+            id1 = input("Ingrese el id de la 1ra estacion: ")
+            id2 = input("Ingrese el id de la 2da estacion: ")
+            time = timeit.timeit(partial(opt3, cbk, id1, id2), number=1)
             print(f"Tiempo de ejecución: {time}")
         elif enter == 4:
             time = timeit.timeit(opt4, number=1)
