@@ -120,8 +120,19 @@ def opt7():
     1
 
 
-def opt8(citibike, latitude, longitude):
-    controller.req6(citibike, latitude, longitude)
+def opt8(citibike, lati, loni, latf, lonf):
+    init, final, path, duration = controller.req6(
+        citibike, lati, loni, latf, lonf)
+    print(
+        f"La estación más cercana al punto inicial es '{init['name']}'.")
+    print(
+        f"La estación más cercana al punto final es '{final['name']}'.")
+    if path is None:
+        print("No existe un camino entre las estaciones.")
+    else:
+        print(f"La duración del camino más corto es de {duration}")
+        print(f"Las estaciones del camino son:", end="\n\t")
+        print(path)
 
 
 def opt9():
@@ -159,7 +170,14 @@ def main():
             time = timeit.timeit(opt7, number=1)
             print(f"Tiempo de ejecución: {time}")
         elif enter == 8:
-            time = timeit.timeit(partial(opt8, cbk, 1, 1), number=1)
+            print("Punto inicial")
+            lati = float(input("Digite la latitud del punto de partida: "))
+            loni = float(input("Digite la longitud del punto de partida: "))
+            print("Punto final")
+            latf = float(input("Digite la latitud del punto de llegada: "))
+            lonf = float(input("Digite la longitud del punto de llegada: "))
+            time = timeit.timeit(
+                partial(opt8, cbk, lati, loni, latf, lonf), number=1)
             print(f"Tiempo de ejecución: {time}")
         elif enter == 9:
             time = timeit.timeit(opt9, number=1)

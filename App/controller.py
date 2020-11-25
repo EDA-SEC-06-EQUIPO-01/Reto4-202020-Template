@@ -118,5 +118,5 @@ def minimumCostPath(citibikes, destStation):
     return model.minimumCostPath(citibikes, destStation)
 
 
-def req6(citibikes, latitude, longitude):
-    return model.req6(citibikes, latitude, longitude)
+def req6(citibikes, lati, loni, latf, lonf):
+    return model.req6(citibikes, lati, loni, latf, lonf)

@@ -31,6 +31,7 @@ from DISClib.DataStructures import listiterator as it
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
 from DISClib.Utils import error as error
+from DISClib.ADT import stack
 
 assert config
 
@@ -83,13 +84,25 @@ def addTrip(citibike, trip):
         trip["end station id"],
         int(trip["tripduration"]),
     )
+    st_station = {}
+    end_station = {}
+
+    for i in trip:
+        if not i.endswith("id"):
+            if "start station" in i:
+                key = i.replace("start station ", "")
+                st_station[key] = trip[i]
+            if "end station" in i:
+                key = i.replace("end station ", "")
+                end_station[key] = trip[i]
+    m.put(citibike["stations"], trip["start station id"], st_station)
+    m.put(citibike["stations"], trip["end station id"], end_station)
 
 
 def addArc(citibike, origin, destination, duration):
     if gr.getEdge(citibike["graph"], origin, destination) is None:
         gr.addEdge(citibike["graph"], origin, destination, duration)
     return citibike
-
 
 # Funciones para agregar informacion al grafo
 
@@ -135,8 +148,7 @@ def minimumCostPath(citibikes, destStation):
     y la estacion destino
     Se debe ejecutar primero la funcion minimumCostPaths
     """
-    path = djk.pathTo(citibikes["paths"], destStation)
-    return path
+    return djk.pathTo(citibikes["paths"], destStation)
 
 
 def totalStations(citibikes):
@@ -153,18 +165,52 @@ def totalTrips(citibikes):
     return gr.numEdges(citibikes["graph"])
 
 
-def req6(citibikes, latitude, longitude):
+def distance(i_lat, i_lon, f_lat, f_lon):
+    return ((float(i_lat) - float(f_lat))**2 + (float(i_lon) - float(f_lon))**2)**(1/2)
+
+
+def req6(citibike, lati, loni, latf, lonf):
     # Paso 1: Encontrar la estación más cercana a la latitud y longitud dados.
-    print(citibikes['components'])
-    for i in travel_map(citibikes['graph']['vertices']):
-        # print(i)
-        break
+    dist_in = 10000
+    dist_fn = 10000
+    for i in travel_map(citibike['stations']):
+        new_dist_in = distance(lati, loni,
+                               i["value"]["latitude"], i["value"]["longitude"])
+        new_dist_fn = distance(latf, lonf,
+                               i["value"]["latitude"], i["value"]["longitude"])
+
+        if new_dist_in < dist_in:
+            dist_in = new_dist_in
+            st_id = i["key"]
+        if new_dist_fn < dist_fn:
+            dist_fn = new_dist_fn
+            fn_id = i["key"]
+
+    minimumCostPaths(citibike, st_id)
+    minPath = djk.pathTo(citibike["paths"], fn_id)
+
+    ls = []
+    duration = 0
+    while not stack.isEmpty(minPath):
+        el = stack.pop(minPath)
+        ls.append((el["vertexA"], el["vertexB"]))
+        duration += int(el["weight"])
+
+    ls = "\n\t".join([f"'{m.get(citibike['stations'], i)['value']['name']}'" +
+                      f" -> '{m.get(citibike['stations'], j)['value']['name']}'"
+                      for i, j in ls])
+
+    return (m.get(citibike["stations"], st_id)["value"],
+            m.get(citibike["stations"], fn_id)["value"],
+            ls,
+            duration)
+
     # Paso 2: Hallar el camino más cercano.
+
 
 # ==============================
 # Funciones Helper
 # ==============================
-
 
 def travel_iter(iter):
     while it.hasNext(iter):
