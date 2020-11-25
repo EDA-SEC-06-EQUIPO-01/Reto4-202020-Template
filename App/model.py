@@ -33,7 +33,7 @@ from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
 from DISClib.Utils import error as error
 from DISClib.ADT import stack
-
+import time
 assert config
 
 """
@@ -68,6 +68,7 @@ def newCitibike():
         )
         citibike["paths"] = None
         citibike["components"] = None
+        citibike["tripsinfo"] = lt.newList(datastructure="ARRAY_LIST")
 
         return citibike
     except Exception as e:
@@ -91,17 +92,19 @@ def addTrip(citibike, trip):
     )
     st_station = {}
     end_station = {}
-
+    tripsinfo = {}
     for i in trip:
-        if not i.endswith("id"):
-            if "start station" in i:
-                key = i.replace("start station ", "")
-                st_station[key] = trip[i]
-            if "end station" in i:
-                key = i.replace("end station ", "")
-                end_station[key] = trip[i]
+        if "start station" in i and not i.endswith("id"):
+            key = i.replace("start station ", "")
+            st_station[key] = trip[i]
+        elif "end station" in i and not i.endswith("id"):
+            key = i.replace("end station ", "")
+            end_station[key] = trip[i]
+        else:
+            tripsinfo[i] = trip[i]
     m.put(citibike["stations"], trip["start station id"], st_station)
     m.put(citibike["stations"], trip["end station id"], end_station)
+    lt.addLast(citibike["tripsinfo"], tripsinfo)
 
 
 def addArc(citibike, origin, destination, duration):
@@ -215,9 +218,29 @@ def req6(citibike, lati, loni, latf, lonf):
             minPath)
 
 
+def req7(citibikes, minAge, maxAge):
+    counter = {}
+    for i in travel_lst(citibikes["tripsinfo"]):
+        # (2020 - año nacimiento)
+        if (time.localtime()[0] - int(i['birth year'])) in range(minAge, maxAge):
+            tuplekey = (i['start station id'], i['end station id'])
+            counter[tuplekey] = counter.get(tuplekey, 0) + 1
+    maxnum = 0
+    ids = lt.newList(datastructure="ARRAY_LIST", cmpfunction=compare)
+    for i in counter:
+        if counter[i] > maxnum:
+            maxnum = counter[i]
+            ids = lt.newList(datastructure="ARRAY_LIST", cmpfunction=compare)
+            lt.addLast(ids, i)
+        elif counter[i] == maxnum:
+            lt.addLast(ids, i)
+    return ids
+
+
 # ==============================
 # Funciones Helper
 # ==============================
+
 
 def travel_iter(iter):
     while it.hasNext(iter):

@@ -134,9 +134,9 @@ def opt7():
     1
 
 
-def opt8(citibike, lati, loni, latf, lonf):
+def opt8(citibikes, lati, loni, latf, lonf):
     init, final, minPath = controller.req6(
-        citibike, lati, loni, latf, lonf)
+        citibikes, lati, loni, latf, lonf)
 
     print(
         f"La estación más cercana al punto inicial es '{init['name']}'.")
@@ -152,8 +152,8 @@ def opt8(citibike, lati, loni, latf, lonf):
             ls_str.append((el["vertexA"], el["vertexB"]))
             duration += int(el["weight"])
 
-        ls_str = "\n\t".join([f"'{m.get(citibike['stations'], i)['value']['name']}'" +
-                              f" -> '{m.get(citibike['stations'], j)['value']['name']}'"
+        ls_str = "\n\t".join([f"'{m.get(citibikes['stations'], i)['value']['name']}'" +
+                              f" -> '{m.get(citibikes['stations'], j)['value']['name']}'"
                               for i, j in ls_str])
 
         print(f"La duración del camino más corto es de {duration}")
@@ -161,8 +161,26 @@ def opt8(citibike, lati, loni, latf, lonf):
         print(ls_str)
 
 
-def opt9():
-    1
+def opt9(citibikes, minAge, maxAge):
+    ret = controller.req7(citibikes, minAge, maxAge)
+    if lt.isEmpty(ret):
+        print(
+            f"No hubo ningún viaje realizado por personas entre {minAge} y {maxAge} años.")
+    elif lt.size(ret) > 1:
+        print(
+            f"Los viajes más frecuentes de personas entre {minAge} y {maxAge} años, son:")
+        for i in controller.travel_list(ret):
+            st = m.get(citibikes["stations"], i[0])["value"]["name"]
+            end = m.get(citibikes["stations"], i[1])["value"]["name"]
+            print(f"\t{st} -> {end}")
+    else:
+        print(
+            f"El viaje más frecuente de personas entre {minAge} y {maxAge} es:")
+        st = m.get(citibikes["stations"], lt.lastElement(ret)[0])[
+            "value"]["name"]
+        end = m.get(citibikes["stations"], lt.lastElement(ret)[1])[
+            "value"]["name"]
+        print(f"\t{st} -> {end}")
 
 
 def opt10():
@@ -210,7 +228,9 @@ def main():
                 partial(opt8, cbk, lati, loni, latf, lonf), number=1)
             print(f"Tiempo de ejecución: {time}")
         elif enter == 9:
-            time = timeit.timeit(opt9, number=1)
+            minAge = int(input("Digite la edad mínima: "))
+            maxAge = int(input("Digite la edad máxima: "))
+            time = timeit.timeit(partial(opt9, cbk, minAge, maxAge), number=1)
             print(f"Tiempo de ejecución: {time}")
         elif enter == 10:
             time = timeit.timeit(opt10, number=1)
