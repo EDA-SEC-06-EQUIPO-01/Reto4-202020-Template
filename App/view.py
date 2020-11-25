@@ -52,7 +52,7 @@ fnms = (
     "201801-4-citibike-tripdata.csv",
 )
 
-option = 41
+option = 1
 
 filename = fnms[option - 1]
 
@@ -120,8 +120,8 @@ def opt7():
     1
 
 
-def opt8():
-    1
+def opt8(citibike, latitude, longitude):
+    controller.req6(citibike, latitude, longitude)
 
 
 def opt9():
@@ -138,7 +138,8 @@ def main():
         if enter == 1:
             cbk = controller.init()
         elif enter == 2:
-            time = timeit.timeit(partial(opt2, cbk, filename, recursionLimit), number=1)
+            time = timeit.timeit(
+                partial(opt2, cbk, filename, recursionLimit), number=1)
             print(f"Tiempo de ejecución: {time}")
         elif enter == 3:
             id1 = input("Ingrese el id de la 1ra estacion: ")
@@ -158,7 +159,7 @@ def main():
             time = timeit.timeit(opt7, number=1)
             print(f"Tiempo de ejecución: {time}")
         elif enter == 8:
-            time = timeit.timeit(opt8, number=1)
+            time = timeit.timeit(partial(opt8, cbk, 1, 1), number=1)
             print(f"Tiempo de ejecución: {time}")
         elif enter == 9:
             time = timeit.timeit(opt9, number=1)

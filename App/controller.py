@@ -116,3 +116,7 @@ def minimumCostPath(citibikes, destStation):
     Retorna el camino de costo minimo desde initialStation a destStation
     """
     return model.minimumCostPath(citibikes, destStation)
+
+
+def req6(citibikes, latitude, longitude):
+    return model.req6(citibikes, latitude, longitude)

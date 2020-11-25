@@ -153,9 +153,38 @@ def totalTrips(citibikes):
     return gr.numEdges(citibikes["graph"])
 
 
+def req6(citibikes, latitude, longitude):
+    # Paso 1: Encontrar la estación más cercana a la latitud y longitud dados.
+    print(citibikes['components'])
+    for i in travel_map(citibikes['graph']['vertices']):
+        # print(i)
+        break
+    # Paso 2: Hallar el camino más cercano.
+
 # ==============================
 # Funciones Helper
 # ==============================
+
+
+def travel_iter(iter):
+    while it.hasNext(iter):
+        yield it.next(iter)
+
+
+def travel_lst(lista, parameter=None):
+    iter = it.newIterator(lista)
+    while it.hasNext(iter):
+        node = it.next(iter)
+        if parameter:
+            yield node[parameter]
+        else:
+            yield node
+
+
+def travel_map(mapa):
+    keys = m.keySet(mapa)
+    for i in travel_lst(keys):
+        yield m.get(mapa, i)
 
 # ==============================
 # Funciones de Comparacion
