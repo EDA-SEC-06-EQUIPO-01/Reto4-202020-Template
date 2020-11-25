@@ -118,5 +118,17 @@ def minimumCostPath(citibikes, destStation):
     return model.minimumCostPath(citibikes, destStation)
 
 
+def travel_list(lst, parameter=None):
+    return model.travel_lst(lst, parameter)
+
+
+def travel_map(mapa):
+    return model.travel_map(mapa)
+
+
 def req6(citibikes, lati, loni, latf, lonf):
     return model.req6(citibikes, lati, loni, latf, lonf)
+
+
+def req4(citibikes, startID, maxTime):
+    return model.req4(citibikes, startID, maxTime)

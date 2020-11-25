@@ -30,6 +30,8 @@ import sys
 import config
 from App import controller
 from DISClib.ADT import stack
+from DISClib.ADT import list as lt
+from DISClib.ADT import map as m
 import timeit
 
 assert config
@@ -112,8 +114,20 @@ def opt5():
     1
 
 
-def opt6():
-    1
+def opt6(citibikes, startID, maxTime):
+    lst = controller.req4(citibikes, startID, maxTime)
+    iniEst = m.get(citibikes["stations"], startID)["value"]["name"]
+    if lt.isEmpty(lst):
+        print(f"No se encontraron caminos desde la estación {iniEst}")
+    else:
+        cont = 1
+        print(f"Los posibles viajes son:")
+        for i in controller.travel_list(lst):
+            print(f"{cont}.\n\tEstación Inicial: {iniEst}")
+            print(f"\tEstación Final: {i[0]}")
+            print(
+                f"\tDuración de viaje: {i[1]//60} minutos y {i[1]%60} segundos.")
+            cont += 1
 
 
 def opt7():
@@ -121,18 +135,30 @@ def opt7():
 
 
 def opt8(citibike, lati, loni, latf, lonf):
-    init, final, path, duration = controller.req6(
+    init, final, minPath = controller.req6(
         citibike, lati, loni, latf, lonf)
+
     print(
         f"La estación más cercana al punto inicial es '{init['name']}'.")
     print(
         f"La estación más cercana al punto final es '{final['name']}'.")
-    if path is None:
+    if minPath is None:
         print("No existe un camino entre las estaciones.")
     else:
+        ls_str = []
+        duration = 0
+        while not stack.isEmpty(minPath):
+            el = stack.pop(minPath)
+            ls_str.append((el["vertexA"], el["vertexB"]))
+            duration += int(el["weight"])
+
+        ls_str = "\n\t".join([f"'{m.get(citibike['stations'], i)['value']['name']}'" +
+                              f" -> '{m.get(citibike['stations'], j)['value']['name']}'"
+                              for i, j in ls_str])
+
         print(f"La duración del camino más corto es de {duration}")
         print(f"Las estaciones del camino son:", end="\n\t")
-        print(path)
+        print(ls_str)
 
 
 def opt9():
@@ -164,7 +190,11 @@ def main():
             time = timeit.timeit(opt5, number=1)
             print(f"Tiempo de ejecución: {time}")
         elif enter == 6:
-            time = timeit.timeit(opt6, number=1)
+            startID = input("Ingrese el ID de la estación inicial: ")
+            maxTime = float(
+                input("Ingrese el tiempo máximo del recorrido (en minutos): "))
+            time = timeit.timeit(
+                partial(opt6, cbk, startID, maxTime), number=1)
             print(f"Tiempo de ejecución: {time}")
         elif enter == 7:
             time = timeit.timeit(opt7, number=1)

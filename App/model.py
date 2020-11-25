@@ -27,6 +27,7 @@ import config
 from DISClib.ADT.graph import gr
 from DISClib.ADT import map as m
 from DISClib.ADT import list as lt
+from DISClib.Algorithms.Graphs import dfs
 from DISClib.DataStructures import listiterator as it
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
@@ -47,6 +48,10 @@ de creacion y consulta sobre las estructuras de datos.
 
 def compareStations(stat, keyval):
     return 0 if stat == keyval["key"] else (1 if stat > keyval["key"] else -1)
+
+
+def compare(el1, el2):
+    return 0 if el1 == el2 else (1 if el1 > el2 else -1)
 
 
 def newCitibike():
@@ -165,6 +170,22 @@ def totalTrips(citibikes):
     return gr.numEdges(citibikes["graph"])
 
 
+def req4(citibikes, startID, maxTime):
+    map_dfs = dfs.DepthFirstSearch(citibikes["graph"], startID)
+    lista = lt.newList(cmpfunction=compare)
+    minimumCostPaths(citibikes, startID)
+    for i in travel_map(map_dfs["visited"]):
+        estFin = i["value"]["edgeTo"]
+        if estFin:
+            minCost = djk.distTo(citibikes["paths"], estFin)
+            if minCost/60 < maxTime and estFin != startID:
+                nomEstFin = m.get(citibikes["stations"], estFin)[
+                    "value"]["name"]
+                if not lt.isPresent(lista, (nomEstFin, minCost)):
+                    lt.addLast(lista, (nomEstFin, minCost))
+    return lista
+
+
 def distance(i_lat, i_lon, f_lat, f_lon):
     return ((float(i_lat) - float(f_lat))**2 + (float(i_lon) - float(f_lon))**2)**(1/2)
 
@@ -189,23 +210,9 @@ def req6(citibike, lati, loni, latf, lonf):
     minimumCostPaths(citibike, st_id)
     minPath = djk.pathTo(citibike["paths"], fn_id)
 
-    ls = []
-    duration = 0
-    while not stack.isEmpty(minPath):
-        el = stack.pop(minPath)
-        ls.append((el["vertexA"], el["vertexB"]))
-        duration += int(el["weight"])
-
-    ls = "\n\t".join([f"'{m.get(citibike['stations'], i)['value']['name']}'" +
-                      f" -> '{m.get(citibike['stations'], j)['value']['name']}'"
-                      for i, j in ls])
-
     return (m.get(citibike["stations"], st_id)["value"],
             m.get(citibike["stations"], fn_id)["value"],
-            ls,
-            duration)
-
-    # Paso 2: Hallar el camino más cercano.
+            minPath)
 
 
 # ==============================
