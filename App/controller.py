@@ -85,6 +85,10 @@ def totalTrips(analyzer):
     return model.totalTrips(analyzer)
 
 
+def req2(cbk, id_init, time_available):
+    return model.req2(cbk, id_init, time_available)
+
+
 def sameCC(sc, station1, station2):
     return model.sameCC(sc, station1, station2)
 

@@ -106,8 +106,31 @@ def opt3(citibikes, id1, id2):
     )
 
 
-def opt4():
-    1
+def opt4(cbk, id_init, time_available):
+    res = controller.req2(cbk, id_init, time_available)
+
+    print(f"Son en total {len(res)} trayectos circulares")
+    print()
+
+    for c1, travel in enumerate(res):
+        print(f"Trayecto circular #{c1+1}")
+        print()
+        s = 0
+        t = None
+        for c2, item in enumerate(travel):
+            print(f"-Viaje #{c2+1}")
+            i = item[2]
+            print(f"   Salida: {i[1]}")
+            print(f"   Llegada: {i[2]}")
+            print(f"   Duracion: {int(i[0]) // 60} minutos")
+            print()
+            s += int(i[0]) // 60
+            t = (c2 + 1) * 20
+
+        print(f" Duracion total: {t + s}")
+        print()
+
+    print()
 
 
 def opt5():
@@ -125,8 +148,7 @@ def opt6(citibikes, startID, maxTime):
         for i in controller.travel_list(lst):
             print(f"{cont}.\n\tEstación Inicial: {iniEst}")
             print(f"\tEstación Final: {i[0]}")
-            print(
-                f"\tDuración de viaje: {i[1]//60} minutos y {i[1]%60} segundos.")
+            print(f"\tDuración de viaje: {i[1]//60} minutos y {i[1]%60} segundos.")
             cont += 1
 
 
@@ -135,13 +157,10 @@ def opt7():
 
 
 def opt8(citibikes, lati, loni, latf, lonf):
-    init, final, minPath = controller.req6(
-        citibikes, lati, loni, latf, lonf)
+    init, final, minPath = controller.req6(citibikes, lati, loni, latf, lonf)
 
-    print(
-        f"La estación más cercana al punto inicial es '{init['name']}'.")
-    print(
-        f"La estación más cercana al punto final es '{final['name']}'.")
+    print(f"La estación más cercana al punto inicial es '{init['name']}'.")
+    print(f"La estación más cercana al punto final es '{final['name']}'.")
     if minPath is None:
         print("No existe un camino entre las estaciones.")
     else:
@@ -152,9 +171,13 @@ def opt8(citibikes, lati, loni, latf, lonf):
             ls_str.append((el["vertexA"], el["vertexB"]))
             duration += int(el["weight"])
 
-        ls_str = "\n\t".join([f"'{m.get(citibikes['stations'], i)['value']['name']}'" +
-                              f" -> '{m.get(citibikes['stations'], j)['value']['name']}'"
-                              for i, j in ls_str])
+        ls_str = "\n\t".join(
+            [
+                f"'{m.get(citibikes['stations'], i)['value']['name']}'"
+                + f" -> '{m.get(citibikes['stations'], j)['value']['name']}'"
+                for i, j in ls_str
+            ]
+        )
 
         print(f"La duración del camino más corto es de {duration}")
         print(f"Las estaciones del camino son:", end="\n\t")
@@ -165,21 +188,20 @@ def opt9(citibikes, minAge, maxAge):
     ret = controller.req7(citibikes, minAge, maxAge)
     if lt.isEmpty(ret):
         print(
-            f"No hubo ningún viaje realizado por personas entre {minAge} y {maxAge} años.")
+            f"No hubo ningún viaje realizado por personas entre {minAge} y {maxAge} años."
+        )
     elif lt.size(ret) > 1:
         print(
-            f"Los viajes más frecuentes de personas entre {minAge} y {maxAge} años, son:")
+            f"Los viajes más frecuentes de personas entre {minAge} y {maxAge} años, son:"
+        )
         for i in controller.travel_list(ret):
             st = m.get(citibikes["stations"], i[0])["value"]["name"]
             end = m.get(citibikes["stations"], i[1])["value"]["name"]
             print(f"\t{st} -> {end}")
     else:
-        print(
-            f"El viaje más frecuente de personas entre {minAge} y {maxAge} es:")
-        st = m.get(citibikes["stations"], lt.lastElement(ret)[0])[
-            "value"]["name"]
-        end = m.get(citibikes["stations"], lt.lastElement(ret)[1])[
-            "value"]["name"]
+        print(f"El viaje más frecuente de personas entre {minAge} y {maxAge} es:")
+        st = m.get(citibikes["stations"], lt.lastElement(ret)[0])["value"]["name"]
+        end = m.get(citibikes["stations"], lt.lastElement(ret)[1])["value"]["name"]
         print(f"\t{st} -> {end}")
 
 
@@ -193,8 +215,7 @@ def main():
         if enter == 1:
             cbk = controller.init()
         elif enter == 2:
-            time = timeit.timeit(
-                partial(opt2, cbk, filename, recursionLimit), number=1)
+            time = timeit.timeit(partial(opt2, cbk, filename, recursionLimit), number=1)
             print(f"Tiempo de ejecución: {time}")
         elif enter == 3:
             id1 = input("Ingrese el id de la 1ra estacion: ")
@@ -202,7 +223,9 @@ def main():
             time = timeit.timeit(partial(opt3, cbk, id1, id2), number=1)
             print(f"Tiempo de ejecución: {time}")
         elif enter == 4:
-            time = timeit.timeit(opt4, number=1)
+            id_init = input("Ingrese el id de la estacion de inicio: ")
+            time_available = int(input("Ingrese el tiempo disponible(minutos): "))
+            time = timeit.timeit(partial(opt4, cbk, id_init, time_available), number=1)
             print(f"Tiempo de ejecución: {time}")
         elif enter == 5:
             time = timeit.timeit(opt5, number=1)
@@ -210,9 +233,9 @@ def main():
         elif enter == 6:
             startID = input("Ingrese el ID de la estación inicial: ")
             maxTime = float(
-                input("Ingrese el tiempo máximo del recorrido (en minutos): "))
-            time = timeit.timeit(
-                partial(opt6, cbk, startID, maxTime), number=1)
+                input("Ingrese el tiempo máximo del recorrido (en minutos): ")
+            )
+            time = timeit.timeit(partial(opt6, cbk, startID, maxTime), number=1)
             print(f"Tiempo de ejecución: {time}")
         elif enter == 7:
             time = timeit.timeit(opt7, number=1)
@@ -224,8 +247,7 @@ def main():
             print("Punto final")
             latf = float(input("Digite la latitud del punto de llegada: "))
             lonf = float(input("Digite la longitud del punto de llegada: "))
-            time = timeit.timeit(
-                partial(opt8, cbk, lati, loni, latf, lonf), number=1)
+            time = timeit.timeit(partial(opt8, cbk, lati, loni, latf, lonf), number=1)
             print(f"Tiempo de ejecución: {time}")
         elif enter == 9:
             minAge = int(input("Digite la edad mínima: "))

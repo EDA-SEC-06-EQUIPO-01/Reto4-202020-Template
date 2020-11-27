@@ -24,6 +24,7 @@
  *
  """
 import config
+import copy
 from DISClib.ADT.graph import gr
 from DISClib.ADT import map as m
 from DISClib.ADT import list as lt
@@ -32,8 +33,11 @@ from DISClib.DataStructures import listiterator as it
 from DISClib.Algorithms.Graphs import scc
 from DISClib.Algorithms.Graphs import dijsktra as djk
 from DISClib.Utils import error as error
+from DISClib.ADT import map as map
 from DISClib.ADT import stack
+from DISClib.DataStructures import adjlist as g
 import time
+
 assert config
 
 """
@@ -97,9 +101,11 @@ def addTrip(citibike, trip):
         if "start station" in i and not i.endswith("id"):
             key = i.replace("start station ", "")
             st_station[key] = trip[i]
+            tripsinfo[i] = trip[i]
         elif "end station" in i and not i.endswith("id"):
             key = i.replace("end station ", "")
             end_station[key] = trip[i]
+            tripsinfo[i] = trip[i]
         else:
             tripsinfo[i] = trip[i]
     m.put(citibike["stations"], trip["start station id"], st_station)
@@ -110,7 +116,9 @@ def addTrip(citibike, trip):
 def addArc(citibike, origin, destination, duration):
     if gr.getEdge(citibike["graph"], origin, destination) is None:
         gr.addEdge(citibike["graph"], origin, destination, duration)
+
     return citibike
+
 
 # Funciones para agregar informacion al grafo
 
@@ -131,6 +139,80 @@ def connectedComponents(citibikes):
 def sameCC(sc, station1, station2):
     sct = scc.KosarajuSCC(sc["graph"])
     return scc.stronglyConnected(sct, station1, station2)
+
+
+round_path = []
+
+
+def req2(cbk, id_init, time_available):
+    sct = scc.KosarajuSCC(cbk["graph"])
+
+    print()
+
+    search = {"source": id_init, "visited": None}
+
+    search["visited"] = map.newMap(
+        numelements=g.numVertices(cbk["graph"]),
+        maptype="PROBING",
+        comparefunction=cbk["graph"]["comparefunction"],
+    )
+
+    map.put(search["visited"], id_init, {"marked": True, "edgeTo": None})
+
+    time_s = time_available * 60
+    dfs_search(
+        search, cbk["graph"], id_init, [], sct, id_init, cbk["tripsinfo"], time_s
+    )
+
+    global round_path
+    r_path = copy.deepcopy(round_path)
+    round_path = []
+
+    return r_path
+
+
+def ss(smt, init, final):
+    for item in travel_lst(smt):
+        if init == item["start station id"] and final == item["end station id"]:
+            return (
+                item["tripduration"],
+                item["start station name"],
+                item["end station name"],
+            )
+
+
+def dfs_search(search, graph, vertex, path, sct, init_v, info, times):
+    path_local = copy.deepcopy(path)
+    adjlst = g.adjacents(graph, vertex)
+    adjslstiter = it.newIterator(adjlst)
+
+    while it.hasNext(adjslstiter):
+        w = it.next(adjslstiter)
+        if scc.stronglyConnected(sct, vertex, w):
+            a = ss(info, vertex, w)
+            s = sum([int(item[2][0]) for item in path])
+            if s + int(a[0]) <= times - (20 * 60):
+                if w == init_v:
+                    inf = (vertex, w, a)
+                    path_local.append(inf)
+                    round_path.append(path_local)
+
+                visited = map.get(search["visited"], w)
+                if visited is None:
+                    map.put(search["visited"], w, {"marked": True, "edgeTo": vertex})
+                    inf = (vertex, w, a)
+                    path_local.append(inf)
+                    dfs_search(
+                        search,
+                        graph,
+                        w,
+                        path_local,
+                        sct,
+                        init_v,
+                        info,
+                        times - (20 * 60),
+                    )
+                    path_local.pop()
 
 
 def minimumCostPaths(citibikes, initialStation):
@@ -181,27 +263,30 @@ def req4(citibikes, startID, maxTime):
         estFin = i["value"]["edgeTo"]
         if estFin:
             minCost = djk.distTo(citibikes["paths"], estFin)
-            if minCost/60 < maxTime and estFin != startID:
-                nomEstFin = m.get(citibikes["stations"], estFin)[
-                    "value"]["name"]
+            if minCost / 60 < maxTime and estFin != startID:
+                nomEstFin = m.get(citibikes["stations"], estFin)["value"]["name"]
                 if not lt.isPresent(lista, (nomEstFin, minCost)):
                     lt.addLast(lista, (nomEstFin, minCost))
     return lista
 
 
 def distance(i_lat, i_lon, f_lat, f_lon):
-    return ((float(i_lat) - float(f_lat))**2 + (float(i_lon) - float(f_lon))**2)**(1/2)
+    return (
+        (float(i_lat) - float(f_lat)) ** 2 + (float(i_lon) - float(f_lon)) ** 2
+    ) ** (1 / 2)
 
 
 def req6(citibike, lati, loni, latf, lonf):
     # Paso 1: Encontrar la estación más cercana a la latitud y longitud dados.
     dist_in = 10000
     dist_fn = 10000
-    for i in travel_map(citibike['stations']):
-        new_dist_in = distance(lati, loni,
-                               i["value"]["latitude"], i["value"]["longitude"])
-        new_dist_fn = distance(latf, lonf,
-                               i["value"]["latitude"], i["value"]["longitude"])
+    for i in travel_map(citibike["stations"]):
+        new_dist_in = distance(
+            lati, loni, i["value"]["latitude"], i["value"]["longitude"]
+        )
+        new_dist_fn = distance(
+            latf, lonf, i["value"]["latitude"], i["value"]["longitude"]
+        )
 
         if new_dist_in < dist_in:
             dist_in = new_dist_in
@@ -213,17 +298,19 @@ def req6(citibike, lati, loni, latf, lonf):
     minimumCostPaths(citibike, st_id)
     minPath = djk.pathTo(citibike["paths"], fn_id)
 
-    return (m.get(citibike["stations"], st_id)["value"],
-            m.get(citibike["stations"], fn_id)["value"],
-            minPath)
+    return (
+        m.get(citibike["stations"], st_id)["value"],
+        m.get(citibike["stations"], fn_id)["value"],
+        minPath,
+    )
 
 
 def req7(citibikes, minAge, maxAge):
     counter = {}
     for i in travel_lst(citibikes["tripsinfo"]):
         # (2020 - año nacimiento)
-        if (time.localtime()[0] - int(i['birth year'])) in range(minAge, maxAge):
-            tuplekey = (i['start station id'], i['end station id'])
+        if (time.localtime()[0] - int(i["birth year"])) in range(minAge, maxAge):
+            tuplekey = (i["start station id"], i["end station id"])
             counter[tuplekey] = counter.get(tuplekey, 0) + 1
     maxnum = 0
     ids = lt.newList(datastructure="ARRAY_LIST", cmpfunction=compare)
@@ -261,6 +348,7 @@ def travel_map(mapa):
     keys = m.keySet(mapa)
     for i in travel_lst(keys):
         yield m.get(mapa, i)
+
 
 # ==============================
 # Funciones de Comparacion
