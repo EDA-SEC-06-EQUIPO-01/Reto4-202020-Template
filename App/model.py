@@ -276,6 +276,43 @@ def distance(i_lat, i_lon, f_lat, f_lon):
     ) ** (1 / 2)
 
 
+def req5(citibikes, de):
+    print()
+
+    go = dict()
+    ba = dict()
+
+    for i in travel_lst(citibikes["tripsinfo"]):
+        dff = 2020 - int(i["birth year"])
+        if de[0] <= dff <= de[1]:
+            c1 = go.get(i["start station name"], [0, 0])
+            c1[0] += 1
+            t1 = [c1[0], i["start station id"]]
+
+            go[i["start station name"]] = t1
+
+            c2 = ba.get(i["end station name"], [0, 0])
+            c2[0] += 1
+            t2 = [
+                c2[0],
+                i["end station id"],
+            ]
+            ba[i["end station name"]] = t2
+    n1 = max(go, key=go.get)
+    n2 = max(ba, key=ba.get)
+    k1 = go[n1]
+    k2 = ba[n2]
+
+    gg = djk.Dijkstra(citibikes["graph"], k1[1])
+
+    if djk.hasPathTo(gg, k2[1]):
+        ww = djk.pathTo(gg, k2[1])
+        ll = [i for i in travel_lst(ww)]
+        return (n1, n2, ll)
+    else:
+        return (n1, n2, None)
+
+
 def req6(citibike, lati, loni, latf, lonf):
     # Paso 1: Encontrar la estación más cercana a la latitud y longitud dados.
     dist_in = 10000

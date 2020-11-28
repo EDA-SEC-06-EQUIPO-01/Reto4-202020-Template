@@ -152,8 +152,18 @@ def opt6(citibikes, startID, maxTime):
             cont += 1
 
 
-def opt7():
-    1
+def opt7(citibikes, de):
+    a = controller.req5(citibikes, de)
+
+    print(f"Estacion de salida: {a[0]}")
+    print(f"Estacion de llegada: {a[1]}")
+    if a[2]:
+        print("Id de estaciones recorrido:")
+        for c, i in enumerate(a[2]):
+            print(f"{c + 1} - {i['vertexA']}")
+        print(f"{c+2} - {i['vertexB']}")
+    else:
+        print("No hay ruta entre ellas")
 
 
 def opt8(citibikes, lati, loni, latf, lonf):
@@ -238,7 +248,23 @@ def main():
             time = timeit.timeit(partial(opt6, cbk, startID, maxTime), number=1)
             print(f"Tiempo de ejecución: {time}")
         elif enter == 7:
-            time = timeit.timeit(opt7, number=1)
+            d = [
+                "0-10",
+                "11-20",
+                "21-30",
+                "31-40",
+                "41-50",
+                "51-60",
+                "60+",
+            ]
+            de = [(0, 10), (11, 20), (21, 30), (31, 40), (41, 50), (51, 60), (61, 100)]
+            print("Opciones")
+            for c, k in enumerate(d):
+                print(f"{c+1}) {k}")
+            print()
+
+            ra = int(input("Seleccione una opcion: "))
+            time = timeit.timeit(partial(opt7, cbk, de[ra - 1]), number=1)
             print(f"Tiempo de ejecución: {time}")
         elif enter == 8:
             print("Punto inicial")

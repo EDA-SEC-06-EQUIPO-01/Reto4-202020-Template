@@ -134,6 +134,10 @@ def req6(citibikes, lati, loni, latf, lonf):
     return model.req6(citibikes, lati, loni, latf, lonf)
 
 
+def req5(citibikes, de):
+    return model.req5(citibikes, de)
+
+
 def req4(citibikes, startID, maxTime):
     return model.req4(citibikes, startID, maxTime)
 
