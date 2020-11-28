@@ -147,8 +147,6 @@ round_path = []
 def req2(cbk, id_init, time_available):
     sct = scc.KosarajuSCC(cbk["graph"])
 
-    print()
-
     search = {"source": id_init, "visited": None}
 
     search["visited"] = map.newMap(
@@ -161,7 +159,8 @@ def req2(cbk, id_init, time_available):
 
     time_s = time_available * 60
     dfs_search(
-        search, cbk["graph"], id_init, [], sct, id_init, cbk["tripsinfo"], time_s
+        search, cbk["graph"], id_init, [
+        ], sct, id_init, cbk["tripsinfo"], time_s
     )
 
     global round_path
@@ -199,7 +198,8 @@ def dfs_search(search, graph, vertex, path, sct, init_v, info, times):
 
                 visited = map.get(search["visited"], w)
                 if visited is None:
-                    map.put(search["visited"], w, {"marked": True, "edgeTo": vertex})
+                    map.put(search["visited"], w, {
+                            "marked": True, "edgeTo": vertex})
                     inf = (vertex, w, a)
                     path_local.append(inf)
                     dfs_search(
@@ -264,7 +264,8 @@ def req4(citibikes, startID, maxTime):
         if estFin:
             minCost = djk.distTo(citibikes["paths"], estFin)
             if minCost / 60 < maxTime and estFin != startID:
-                nomEstFin = m.get(citibikes["stations"], estFin)["value"]["name"]
+                nomEstFin = m.get(citibikes["stations"], estFin)[
+                    "value"]["name"]
                 if not lt.isPresent(lista, (nomEstFin, minCost)):
                     lt.addLast(lista, (nomEstFin, minCost))
     return lista
@@ -315,8 +316,7 @@ def req5(citibikes, de):
 
 def req6(citibike, lati, loni, latf, lonf):
     # Paso 1: Encontrar la estación más cercana a la latitud y longitud dados.
-    dist_in = 10000
-    dist_fn = 10000
+    firstline = True
     for i in travel_map(citibike["stations"]):
         new_dist_in = distance(
             lati, loni, i["value"]["latitude"], i["value"]["longitude"]
@@ -324,7 +324,10 @@ def req6(citibike, lati, loni, latf, lonf):
         new_dist_fn = distance(
             latf, lonf, i["value"]["latitude"], i["value"]["longitude"]
         )
-
+        if firstline:
+            firstline = False
+            dist_in, dist_fn = new_dist_in, new_dist_fn
+            continue
         if new_dist_in < dist_in:
             dist_in = new_dist_in
             st_id = i["key"]
