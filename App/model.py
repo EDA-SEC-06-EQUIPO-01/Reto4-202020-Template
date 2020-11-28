@@ -397,12 +397,12 @@ def req3(citibikes):
         top3Salida = (max(diccSal.keys))-2
         top3Sal = top3Salida.getValue  # top3
 
-        # top estaciones salida
-        if i["start station name"] in diccMenor:  # diccionario para contar el menor en salidas
+        # top estaciones menor llegada y salida
+        if i["start station name"] in diccMenor:  # diccionario para contar el mayor en salidas
             diccMenor[i] += 1
         else:
             diccMenor[i] = 1
-        # diccionario para contar el menor en llegadas
+        # diccionario para contar el mayor en llegadas
         if (i["end station name"] == i["start station name"]) in diccMenor:
             # si los nombres son iguales osea ya existe, entonces sumo 1
             diccMenor[i] += 1

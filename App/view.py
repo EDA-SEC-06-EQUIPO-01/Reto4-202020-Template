@@ -136,7 +136,7 @@ def opt4(cbk, id_init, time_available):
 def opt5(citibikes):
     rta = controller.req3(citibikes)
     print(
-        f" Las 3 estaciones principales a las que mas bicicletas llegan provenientes de otras estaciones: {rta[0]} , Las 3 estaciones de las que más viajes salen hacia otras estaciones: {rta[1]} , las 3 estaciones menos utilizadas por los turistas: {rta[0]}")
+        f" Las 3 estaciones principales a las que mas bicicletas llegan provenientes de otras estaciones: {rta[0]} , Las 3 estaciones de las que más viajes salen hacia otras estaciones: {rta[1]} , las 3 estaciones menos utilizadas por los turistas: {rta[2]}")
 
 
 def opt6(citibikes, startID, maxTime):
