@@ -144,3 +144,6 @@ def req4(citibikes, startID, maxTime):
 
 def req7(citibikes, minAge, maxAge):
     return model.req7(citibikes, minAge, maxAge)
+
+def req3 (citibikes):
+    return model.req3(citibikes)

@@ -360,6 +360,12 @@ def req7(citibikes, minAge, maxAge):
             lt.addLast(ids, i)
     return ids
 
+def req3 (citibikes):
+    topLleg=0
+    topSal=0
+    topMenos=0
+    tupla= (topLleg, topSal, topMenos)
+    return tupla
 
 # ==============================
 # Funciones Helper
