@@ -361,9 +361,24 @@ def req7(citibikes, minAge, maxAge):
     return ids
 
 def req3 (citibikes):
-    topLleg=0
-    topSal=0
-    topMenos=0
+    topLleg=None
+    topSal=None
+    topMenos=None
+    diccLleg={}
+    for i in travel_map(citibikes["stations"]):
+        if i["end station name"] in diccLleg:
+            diccLleg[i] += 1 
+        else :
+            diccLleg[i] = 1
+        top1Llegada= max(diccLleg.keys)
+        top1Lleg = top1Llegada.getValue
+        top2Llegada= (max(diccLleg.keys))-1
+        top2Lleg = top2Llegada.getValue
+        top3Llegada= (max(diccLleg.keys))-2
+        top3Lleg = top3Llegada.getValue
+        
+        topLleg=(top1Lleg,top2Lleg,top3Lleg)
+
     tupla= (topLleg, topSal, topMenos)
     return tupla
 
