@@ -133,8 +133,10 @@ def opt4(cbk, id_init, time_available):
     print()
 
 
-def opt5():
-    1
+def opt5(citibikes):
+    rta = controller.req3(citibikes)
+    print(
+        f" Las 3 estaciones principales a las que mas bicicletas llegan provenientes de otras estaciones: {rta[0]} , Las 3 estaciones de las que más viajes salen hacia otras estaciones: {rta[1]} , las 3 estaciones menos utilizadas por los turistas: {rta[0]}")
 
 
 def opt6(citibikes, startID, maxTime):
@@ -168,6 +170,7 @@ def opt7(citibikes, de):
 
 
 def opt8(citibikes, lati, loni, latf, lonf):
+    print()
     init, final, minPath = controller.req6(citibikes, lati, loni, latf, lonf)
 
     print(f"La estación más cercana al punto inicial es '{init['name']}'.")
@@ -245,7 +248,7 @@ def main():
                 partial(opt4, cbk, id_init, time_available), number=1)
             print(f"Tiempo de ejecución: {time}")
         elif enter == 5:
-            time = timeit.timeit(opt5, number=1)
+            time = timeit.timeit(partial(opt5, cbk), number=1)
             print(f"Tiempo de ejecución: {time}")
         elif enter == 6:
             startID = input("Ingrese el ID de la estación inicial: ")

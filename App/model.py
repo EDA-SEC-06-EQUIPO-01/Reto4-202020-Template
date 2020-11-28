@@ -364,6 +364,66 @@ def req7(citibikes, minAge, maxAge):
     return ids
 
 
+def req3(citibikes):
+    topLleg = None
+    topSal = None
+    topMenos = None
+    diccLleg = {}
+    diccSal = {}
+    diccMenor = {}
+    for i in travel_map(citibikes["stations"]):
+
+        # top estaciones llegada
+        if i["end station name"] in diccLleg:   # diccionario para contar el mayor
+            diccLleg[i] += 1
+        else:
+            diccLleg[i] = 1
+        top1Llegada = max(diccLleg.keys)
+        top1Lleg = top1Llegada.getValue  # top1
+        top2Llegada = (max(diccLleg.keys))-1
+        top2Lleg = top2Llegada.getValue  # top2
+        top3Llegada = (max(diccLleg.keys))-2
+        top3Lleg = top3Llegada.getValue  # top3
+
+        # top estaciones salida
+        if i["start station name"] in diccSal:  # diccionario para contar el mayor
+            diccSal[i] += 1
+        else:
+            diccSal[i] = 1
+        top1Salida = max(diccSal.keys)
+        top1Sal = top1Salida.getValue  # top1
+        top2Salida = (max(diccSal.keys))-1
+        top2Sal = top2Salida.getValue  # top2
+        top3Salida = (max(diccSal.keys))-2
+        top3Sal = top3Salida.getValue  # top3
+
+        # top estaciones salida
+        if i["start station name"] in diccMenor:  # diccionario para contar el menor en salidas
+            diccMenor[i] += 1
+        else:
+            diccMenor[i] = 1
+        # diccionario para contar el menor en llegadas
+        if (i["end station name"] == i["start station name"]) in diccMenor:
+            # si los nombres son iguales osea ya existe, entonces sumo 1
+            diccMenor[i] += 1
+        else:
+            diccMenor[i] = 1
+        top1Menor = min(diccMenor.keys)
+        top1Men = top1Menor.getValue  # top1
+        top2Menor = (min(diccMenor.keys))+1
+        top2Men = top2Menor.getValue  # top2
+        top3Menor = (min(diccMenor.keys))+2
+        top3Men = top3Menor.getValue  # top3
+
+        # tuplas iniciales
+        topLleg = (top1Lleg, top2Lleg, top3Lleg)
+        topSal = (top1Sal, top2Sal, top3Sal)
+        topMen = (top1Men, top2Men, top3Men)
+        # tupla final
+        tupla = (topLleg, topSal, topMen)
+        # retorno tupla final
+        return tupla
+
 # ==============================
 # Funciones Helper
 # ==============================
